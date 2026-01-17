@@ -889,6 +889,11 @@ VMM_HANDLE VmmDllCore_Initialize(_In_ DWORD argc, _In_ LPCSTR argv[], _Out_opt_ 
     // 6: initialize/(refresh) the logging sub-system
     VmmLog_LevelRefresh(H);
     // 7: Set LeechCore MemMap (if exists and not auto - i.e. from file)
+    //    Default to mmap.txt in library directory if no memmap specified
+    if(!H->cfg.szMemMap[0] && !H->cfg.szMemMapStr[0] && !H->cfg.fMemMapAuto && !H->cfg.fMemMapNone) {
+        Util_GetPathLib(H->cfg.szMemMap);
+        strncat_s(H->cfg.szMemMap, _countof(H->cfg.szMemMap), "mmap.txt", _TRUNCATE);
+    }
     if(H->cfg.szMemMap[0] && !H->cfg.fMemMapAuto) {
         f = (pbMemMap = LocalAlloc(LMEM_ZEROINIT, 0x01000000)) &&
             !fopen_s(&hFile, H->cfg.szMemMap, "rb") && hFile &&
